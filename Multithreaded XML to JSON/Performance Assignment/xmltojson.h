@@ -22,7 +22,6 @@ const char SQREND = ']';
 const char CDATA[9] = "![CDATA["; // deal with CDATA later
 const char CARRET = 13; // for a carriage return
 
-/// TODO : add something to encapsulate the objects in a {}
 std::string buildJSONstringFromObject(std::list<Object*>& objects, int currentNoIndents) {
 	if (objects.size() < 1)
 		return "";
@@ -33,7 +32,8 @@ std::string buildJSONstringFromObject(std::list<Object*>& objects, int currentNo
 		retStr = retStr + "\"" + o->getName() + "\": ";
 		if (isOnlyWhitespace(o->getAttribute())) {
 			retStr = retStr + "[\n" + buildJSONstringFromObject(o->getChildren(), currentNoIndents + 1); // I think recursion is pretty inefficient 
-			for (int i = 1; i < currentNoIndents; i++) retStr += "\t"; retStr += "],\n";
+			for (int i = 1; i < currentNoIndents; i++) 
+				retStr += "\t"; retStr += "],\n";
 		}
 		else {
 			retStr = retStr + "\"" + o->getAttribute() + "\",\n"; // maybe do something else with the comma cause it'll still add it even at the end
@@ -44,7 +44,7 @@ std::string buildJSONstringFromObject(std::list<Object*>& objects, int currentNo
 
 std::string ConvertXMLToJSON(std::vector<char> xml) {
 
-	size_t i(0);
+	int i(0);
 	char curChar = xml[i];
 	std::string builder = "";
 	std::string name, data;
@@ -75,8 +75,9 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 				i++;
 
 				// loop past until the name close is found
-				while (xml[i] != CLOSE)
+				while (xml[i] != CLOSE) {
 					i++;
+				}
 				i++; //
 				continue;
 			}
@@ -87,36 +88,34 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 
 #pragma region Deal with creating a new object and adding attribute
 			while (curChar != CLOSE) {
-				if (curChar != NEWLINE && curChar != TAB)
+				if (curChar != NEWLINE && curChar != TAB) {
 					builder += curChar;
+				}
 				curChar = xml[++i];
 			}
-			// add this later
-			/*if (obj != nullptr) // if the pointer isn't null
-				if (isOnlyWhitespace(obj->getName)) //
-					obj->addChild(new Object());*/
-
 
 			if (!isOnlyWhitespace(obj->getName()) && !isOnlyWhitespace(builder)) {
-				Object* newObj = new Object(); //pointer goes out of scope but the object still exists - probably really bad
+				//pointer goes out of scope but the object still exists - probably really bad
+				Object* newObj = new Object(); 
 				newObj->setParent(obj);
-				obj->addChild(newObj); // maybe add an add object bit here
+				obj->addChild(newObj);
 				obj = newObj;
 			}
-			if (isOnlyWhitespace(obj->getName()))
-				obj->setName(builder); // set the name of the object
-
+			if (isOnlyWhitespace(obj->getName())) {
+				// set the name of the object
+				obj->setName(builder); 
+			}
 #pragma endregion
 
 #pragma region Deals with getting the attribute from the xml object
-			//  
 			if (xml[i + 1] != OPEN && xml[i + 1] != CLOSE)
 			{
 				builder = "";
 				curChar = xml[i + 1];
 				while (curChar != OPEN) {
-					if (curChar != NEWLINE && curChar != TAB)
+					if (curChar != NEWLINE && curChar != TAB) {
 						builder += curChar;
+					}
 					curChar = xml[++i];
 				}
 				obj->setAttribute(builder);
@@ -139,11 +138,15 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 		i++;
 	}
 
+	int z = 0;
+
 	// need to loop through the objects and turn them into JSON
 	std::string stringBuilder(buildJSONstringFromObject(objects, 1));
 
 	// Pretty sure the objects weren't being delted from memory before
-	std::for_each(objects.begin(), objects.end(), [](Object* o) {delete o; });
+	std::for_each(objects.begin(), objects.end(), [](Object* o) {
+		delete o; 
+	});
 
 	return stringBuilder;
 }
