@@ -8,7 +8,9 @@ bool isOnlyWhitespace(const std::string& str)
 {
     auto it = str.begin();
     do {
-        if (it == str.end()) return true;
+        if (it == str.end()) {
+            return true;
+        }
     } while (*it >= 0 && *it < str.size() && std::isspace(*(it++)));
     return false;
 }

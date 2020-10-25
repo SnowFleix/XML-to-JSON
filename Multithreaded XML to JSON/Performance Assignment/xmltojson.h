@@ -19,8 +19,10 @@ const char QUATIONMARK = '?';
 const char MINUS = '-';
 const char SQRFRONT = '[';
 const char SQREND = ']';
-const char CDATA[9] = "![CDATA["; // deal with CDATA later
-const char CARRET = 13; // for a carriage return
+// deal with CDATA later
+const char CDATA[9] = "![CDATA["; 
+// for a carriage return
+const char CARRET = 13; 
 
 std::string buildJSONstringFromObject(std::list<Object*>& objects, int currentNoIndents) {
 	if (objects.size() < 1)
@@ -31,12 +33,14 @@ std::string buildJSONstringFromObject(std::list<Object*>& objects, int currentNo
 		for (int i = 0; i < currentNoIndents; i++) retStr += "\t";
 		retStr = retStr + "\"" + o->getName() + "\": ";
 		if (isOnlyWhitespace(o->getAttribute())) {
-			retStr = retStr + "[\n" + buildJSONstringFromObject(o->getChildren(), currentNoIndents + 1); // I think recursion is pretty inefficient 
+			// I think recursion is pretty inefficient 
+			retStr = retStr + "[\n" + buildJSONstringFromObject(o->getChildren(), currentNoIndents + 1); 
 			for (int i = 1; i < currentNoIndents; i++) 
 				retStr += "\t"; retStr += "],\n";
 		}
 		else {
-			retStr = retStr + "\"" + o->getAttribute() + "\",\n"; // maybe do something else with the comma cause it'll still add it even at the end
+			// maybe do something else with the comma cause it'll still add it even at the end
+			retStr = retStr + "\"" + o->getAttribute() + "\",\n"; 
 		}
 	}
 	return retStr;
@@ -49,17 +53,18 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 	std::string builder = "";
 	std::string name, data;
 	std::list<Object*> objects;
-	Object* obj = new Object(); // current object
+	// current object
+	Object* obj = new Object(); 
 
 	while (i < xml.size()) {
 		curChar = xml[i];
 #pragma region Dealing with new lines, tabs and carriage returns
-		if (curChar == NEWLINE || curChar == TAB || curChar == CARRET) { // if it's a newline, tab or carriage return there's no need to do anything
+		// if it's a newline, tab or carriage return there's no need to do anything
+		if (curChar == NEWLINE || curChar == TAB || curChar == CARRET) { 
 			i++; continue;
 		}
 #pragma endregion
 
-		// 
 		if (curChar == OPEN) {
 
 #pragma region Deals with the object finishing
@@ -71,14 +76,13 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 					objects.push_back(obj);
 					obj = new Object();
 				}
-
 				i++;
 
 				// loop past until the name close is found
 				while (xml[i] != CLOSE) {
 					i++;
 				}
-				i++; //
+				i++;
 				continue;
 			}
 #pragma endregion
@@ -124,7 +128,8 @@ std::string ConvertXMLToJSON(std::vector<char> xml) {
 #pragma endregion
 
 #pragma region Dealing with xml comments
-			if (xml[i + 1] == EXCLAMATION && xml[i + 2] == MINUS && xml[i + 3] == MINUS) {// if it has <!-- it means it's a comment
+			// if it has <!-- it means it's a comment
+			if (xml[i + 1] == EXCLAMATION && xml[i + 2] == MINUS && xml[i + 3] == MINUS) {
 				i += 4; curChar = xml[i];
 				while (!(xml[i] == MINUS && xml[i + 1] == MINUS && xml[i + 2] == CLOSE)) {
 					/// doesn't do anything with the comments yet
